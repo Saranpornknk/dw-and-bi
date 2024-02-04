@@ -1,0 +1,19 @@
+
+Process of this work
+
+1. file 'etc.py'
+
+มีการ `pip install psycopg2` เพื่อโหลด library ให้ code space สามารถเขียนเชื่อมต่อกับ Postgres ได้
+
+2. file 'docker-compose.yml'
+
+**Docker Compose คืออะไร**
+Docker compose นั้นว่าง่ายๆ จะคล้ายๆกับ script คำสั่ง ที่เอาไว้สร้าง container หลายๆอันขึ้นมาพร้อมกัน โดยใช้คำสั่งเดียว
+[https://medium.com/touch-technologies/ทำความรู้จัก-docker-compose-b6688fc98c6f](https://medium.com/touch-technologies/%E0%B8%97%E0%B8%B3%E0%B8%84%E0%B8%A7%E0%B8%B2%E0%B8%A1%E0%B8%A3%E0%B8%B9%E0%B9%89%E0%B8%88%E0%B8%B1%E0%B8%81-docker-compose-b6688fc98c6f)
+
+มีการเขียนคำสั่ง `docker compose up` เพื่อ run Docker compose ซึ่งในไฟล์จะประกอบไปด้วยสร้าง Postgres DB และ adminer คือ service หน้า UI บนเว็บเพื่อต่อ data base
+
+3. file 'create_tables.py'
+
+เป็นการสร้าง Data Model ที่เราจะโหลดข้อมูล Json เข้าไป ต้อง run create table ก่อน run ETL ไม่งั้นจะหา Table ไม่เจอ create table กระบวนการ คือ drop ข้อมูลทั้งหมดที่มีทิ้งแล้วสร้างใหม่ และมีการเชื่อมต่อกับ postgres
+** ถ้าจะ Run script python ต้องพิม `python` ก่อนตามด้วยชื่อไฟล์ที่ต้องการ run Ex. `python create_tables.py`
