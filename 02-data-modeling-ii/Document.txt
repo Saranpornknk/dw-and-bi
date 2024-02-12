@@ -1,0 +1,25 @@
+How to run this Project
+
+## Docker-compose.yml
+
+1. `docker compose up`
+
+## สร้าง Python virtualenv environment 
+
+1. `cd 02-data-modeling-ii/` 
+2. สร้าง Python virtualenv environment     `python -m venv ENV` 
+
+virtualenv เป็น Standard Library ใช้สำหรับสร้าง Virtual Environment ของ Python เพื่อลดปัญหาในเรื่องของ Dependency และ Version ของ Application
+
+## requirement.txt 
+คือ file ที่เรา list package ต่างๆ ที่เราจะติดตั้งใน Project นี้   และมีการ Pin version package ที่เราจะติดตั้ง ไว้ด้วย เพื่อให้ทุกคนสามารถ Run ด้วย packkage เดียวกันไม่ว่าจะ Run บนเครื่องไหนก็ตาม
+
+1. เข้าไปอยู่ใน vent ENV ที่เราสร้างขึ้น `source ENV/bin/activate` 
+2. `pip install -r requirements.txt`  อ่านไฟล์ requirement.txt ว่าเราจะติดตั้ง package อะไรบ้างที่เรา list ไว้
+3. `pip freeze` โชว์ packkage ที่เราติดตั้งไป
+
+## etl.txt 
+ใช้งาน package python ของ Cassandra ซึ่งมีการ set package และ version ไว้ที่ requirement.txt
+
+1. ไฟล์ etl ⇒ ประกอบไปด้วยส่วนการ drop table, create table,  query, get file, process, insert_data and connecting with Cassandra 
+2. run file ⇒`python [etl.py](http://etl.py/)` เป็นการ insert ข้อมูลเข้าไปแล้ว print data ออกมา แต่ result ยังมีการ error อยู่ในครั้งแรกเนื่องจากยังหา key space event ไม่เจอ จากนั้นมันจะทำการ insert และ print row ออกมาตามที่เรา query จะเท่ากับสามารถเชื่อมต่อ cassandra ได้แล้ว
