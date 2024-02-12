@@ -6,7 +6,7 @@ from typing import List
 from cassandra.cluster import Cluster
 
 
-table_drop = "DROP TABLE events"
+table_drop = "DROP TABLE IF EXISTS events"
 
 table_create = """
     CREATE TABLE IF NOT EXISTS events
@@ -31,7 +31,7 @@ drop_table_queries = [
 def drop_tables(session):
     for query in drop_table_queries:
         try:
-            rows = session.execute(query)
+            session.execute(query)
         except Exception as e:
             print(e)
 
@@ -61,25 +61,23 @@ def get_files(filepath: str) -> List[str]:
     return all_files
 
 
-def process(session, filepath):
-    # Get list of files from filepath
-    all_files = get_files(filepath)
+def insert_data_from_file(session, filepath):
+    with open(filepath, "r") as f:
+        data = json.load(f)
+        for event in data:
+            try:
+                event_id = event["id"]
+                event_type = event["type"]
+                is_public = event["public"]
 
-    for datafile in all_files:
-        with open(datafile, "r") as f:
-            data = json.loads(f.read())
-            for each in data:
-                # Print some sample data
-                print(each["id"], each["type"], each["actor"]["login"])
+                query = """
+                INSERT INTO events (id, type, public) VALUES (%s, %s, %s)
+                """
+                session.execute(query, (event_id, event_type, is_public))
 
-                # Insert data into tables here
-
-
-def insert_sample_data(session):
-    query = f"""
-    INSERT INTO events (id, type, public) VALUES ('23487929637', 'IssueCommentEvent', true)
-    """
-    session.execute(query)
+                print(f"Inserted event: {event_id}, {event_type}, {is_public}")
+            except Exception as e:
+                print(f"Error inserting event: {str(e)}")
 
 
 def main():
@@ -106,12 +104,12 @@ def main():
     drop_tables(session)
     create_tables(session)
 
-    # process(session, filepath="../data")
-    insert_sample_data(session)
+    # Insert data from file
+    insert_data_from_file(session, filepath="/workspaces/dw-and-bi/data/github_events_01.json")
 
     # Select data in Cassandra and print them to stdout
     query = """
-    SELECT * from events WHERE id = '23487929637' AND type = 'IssueCommentEvent'
+    SELECT * from events
     """
     try:
         rows = session.execute(query)
