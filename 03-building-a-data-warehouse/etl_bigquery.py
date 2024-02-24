@@ -36,6 +36,7 @@ def main(dataset_id, table_id, file_path):
     # keyfile = os.environ.get("KEYFILE_PATH")
     #
     # แต่เพื่อความง่ายเราสามารถกำหนด File Path ไปได้เลยตรง ๆ
+    # มีการสร้าง floder เพื่อเก็บ credentials จึงต้องมีการเพิ่มการ direct ไปที่ key file '../credentials/'
     keyfile = "../credentials/ds525-data-warehouse-swu-ds525-load-data-to-bigquer-14fa0e9d6781.json"
     service_account_info = json.load(open(keyfile))
     credentials = service_account.Credentials.from_service_account_info(service_account_info)
