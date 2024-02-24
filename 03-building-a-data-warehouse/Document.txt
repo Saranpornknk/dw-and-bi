@@ -1,0 +1,19 @@
+Create data warehouse connect with Big Query
+
+1. Create Virtual Environment if do not create before `python -m venv ENV` → `source ENV/bin/activate`
+2. `pip install -r requirements.txt` เพื่อติดตั้ง package ต่างๆที่เรา set ไว้ในไฟล์ requirements.txt ให้อยู่ใน EV ที่เราสร้างขึ้น
+
+file 'etl_bigquery.py'
+
+- Get file อ่านไฟล์จาก Directory ที่เราสร้างขึ้น
+- ใช้ Keyfile เพื่อสร้าง Credentials เอาไว้เชื่อมต่อกับ BigQuery
+- Configure Job ที่เราจะส่งไปทำงานที่ BigQuery โดยหลัก ๆ เราก็จะกำหนดว่าไฟล์ที่เราจะโหลดขึ้นไปมี. format อะไร มี Schema หน้าตาประมาณไหน
+- มีการอ่านไฟล์ CSV และโหลดขึ้นไปยัง BigQuery
+
+project_id  ⇒ ชื่อ Project บน Big query ที่เราจะทำการส่งข้อมูลไป
+
+keyfile ⇒ [YOUR_KEYFILE_PATH] สามารถสร้างโดยการไปที่ IAM & Admin → Service Account → **Create service account → click key you make → Key [download.json]**
+
+1. นำ Keyfile ที่ได้ไปวางไว้ใน Project githup [อาจจะทำการสร้าง folder ขึ้นมาใหม่เพื่อเก็บ credentail โดยเฉพาะก็ได้ **ต้องตรวจสอบการเขียน ../ชื่อ floeder correct credentail/file key หากมีการสร้าง floder ใหม่] 
+2. Run file 'etl_bigquery.py' `python etl_bigquery.py`
+3. ข้อมูลจะถูกส่งไปเก็บที่ big query เรียบร้อยสามารถไปใช้งานต่อที่ Big query เพื่อ query ดูข้อมูลได้
