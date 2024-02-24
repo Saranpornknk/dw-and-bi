@@ -1,4 +1,4 @@
-Create data warehouse connect with Big Query
+How to create data warehouse connect with Big Query in this project
 
 1. Create Virtual Environment if do not create before `python -m venv ENV` → `source ENV/bin/activate`
 2. `pip install -r requirements.txt` เพื่อติดตั้ง package ต่างๆที่เรา set ไว้ในไฟล์ requirements.txt ให้อยู่ใน EV ที่เราสร้างขึ้น
