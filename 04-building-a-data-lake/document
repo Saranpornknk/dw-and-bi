@@ -1,0 +1,7 @@
+Step to run this Project
+
+1. cd 04-building-a-data-lake
+2. `docker compose up`
+3. into port 8888 use Spark in JupyterLab on local
+4. copy token from terminal
+5. Can use Spark for Transform data
