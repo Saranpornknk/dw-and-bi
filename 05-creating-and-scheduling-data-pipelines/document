@@ -1,0 +1,176 @@
+Terminal For Create Docker-compose for Airflow
+
+1. cd **05-creating-and-scheduling-data-pipelines**
+2. curl -LfO 'https://airflow.apache.org/docs/apache-airflow/2.9.0/docker-compose.yaml'
+
+(Ref: https://airflow.apache.org/docs/apache-airflow/stable/howto/docker-compose/index.html) 
+
+1. In file docker-compose line 56 change 'CeleryExecutor' → 'LocalExecutor'
+2. Line 58 and 59 is about Celery not use can close by #
+3. not use
+4. Line 58 and 59 is about Celery not use can close by #
+5. not use
+
+````
+line 83 # redis:
+line 84 #   condition: service_healthy
+
+line 104-114
+  # redis:
+  #   image: redis:latest
+  #   expose:
+  #     - 6379
+  #   healthcheck:
+  #     test: ["CMD", "redis-cli", "ping"]
+  #     interval: 10s
+  #     timeout: 30s
+  #     retries: 50
+  #     start_period: 30s
+  #   restart: always
+  
+ line 148-169
+  # airflow-worker:
+  #   <<: *airflow-common
+  #   command: celery worker
+  #   healthcheck:
+  #     # yamllint disable rule:line-length
+  #     test:
+  #       - "CMD-SHELL"
+  #       - 'celery --app airflow.providers.celery.executors.celery_executor.app inspect ping -d "celery@$${HOSTNAME}" || celery --app airflow.executors.celery_executor.app inspect ping -d "celery@$${HOSTNAME}"'
+  #     interval: 30s
+  #     timeout: 10s
+  #     retries: 5
+  #     start_period: 30s
+  #   environment:
+  #     <<: *airflow-common-env
+  #     # Required to handle warm shutdown of the celery workers properly
+  #     # See https://airflow.apache.org/docs/docker-stack/entrypoint.html#signal-propagation
+  #     DUMB_INIT_SETSID: "0"
+  #   restart: always
+  #   depends_on:
+  #     <<: *airflow-common-depends-on
+  #     airflow-init:
+  #       condition: service_completed_successfully
+  
+line 171-184 
+  # airflow-triggerer:
+  #   <<: *airflow-common
+  #   command: triggerer
+  #   healthcheck:
+  #     test: ["CMD-SHELL", 'airflow jobs check --job-type TriggererJob --hostname "$${HOSTNAME}"']
+  #     interval: 30s
+  #     timeout: 10s
+  #     retries: 5
+  #     start_period: 30s
+  #   restart: always
+  #   depends_on:
+  #     <<: *airflow-common-depends-on
+  #     airflow-init:
+  #       condition: service_completed_successfully
+  
+line 266-283   
+  # flower:
+  #   <<: *airflow-common
+  #   command: celery flower
+  #   profiles:
+  #     - flower
+  #   ports:
+  #     - "5555:5555"
+  #   healthcheck:
+  #     test: ["CMD", "curl", "--fail", "http://localhost:5555/"]
+  #     interval: 30s
+  #     timeout: 10s
+  #     retries: 5
+  #     start_period: 30s
+  #   restart: always
+  #   depends_on:
+  #     <<: *airflow-common-depends-on
+  #     airflow-init:
+  #       condition: service_completed_successfully
+
+````
+6. run in terminal
+
+```
+mkdir -p ./dags ./logs ./plugins ./config
+echo -e "AIRFLOW_UID=$(id -u)" > .env
+````
+
+7. run docker compose up
+
+# Goto Airflow 
+
+Port → 8080 → user/pass = airflow
+
+## Write Dags Basic
+
+1. Created file in folder 'dags'  name 'my_first_dag.py'
+2. Write code Basic DAG airflow
+
+```
+from airflow import DAG
+from airflow.operators.empty import EmptyOperator
+from airflow.utils import timezone
+
+
+#Open file Dag
+with DAG(
+    "my_first_dag", #dag ID is the same file name
+    start_date=timezone.datetime(2024, 4, 9),
+    schedule=None,    
+    tags=["DS525"],
+):
+    my_first_task = EmptyOperator(task_id="my_first_task")
+    my_second_task = EmptyOperator(task_id="my_second_task")
+
+    my_first_task >> my_second_task
+
+```
+
+## Write Dags Advance use Bash and Python Operator
+
+1. Created file in folder 'dags'  name 'hello.py'
+2. Write code Advance DAG airflow
+
+```
+import logging
+
+from airflow import DAG
+from airflow.operators.bash import BashOperator
+from airflow.operators.empty import EmptyOperator
+from airflow.operators.python import PythonOperator
+from airflow.utils import timezone
+
+
+
+
+
+def _say_hello():
+    logging.debug("This is DEBUG log")
+    logging.info("hello")
+
+#Open file Dag
+with DAG(
+    "hello", #dag ID is the same file name
+    start_date=timezone.datetime(2024, 4, 9),
+    schedule=None,    
+    tags=["DS525"],
+):
+    start = EmptyOperator(task_id="start")
+
+    echo_hello = BashOperator(
+        task_id="echo_hello",
+        bash_command = "echo 'hello'",
+    )
+
+    say_hello = PythonOperator(
+        task_id="say_hello",
+        python_callable=_say_hello,
+    )
+
+    end = EmptyOperator(task_id="end")
+
+    start >> echo_hello >> end
+    start >> say_hello >> end
+
+````
