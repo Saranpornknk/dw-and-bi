@@ -1,0 +1,97 @@
+analytics-engineering
+
+Step run Code
+
+1. `cd 06-analytics-engineering`
+2. `Docker compose up`
+    
+    Run 2 Service
+    
+    - Postgres : Data base
+    - Sqlpad : View data in Postgres [run in port 3000]
+3. Set up DBT Project and Create Profile for do Analytics Engineering
+    1. `cd 06-analytics-engineering`
+    2. Create ENV : `python -m venv ENV`
+    3. Activate : `source ENV/bin/activate`
+    4. install packgage dbt: `pip install dbt-core dbt-postgres`
+    5. initial project : `dbt init`
+    6. Create prompt generate project : `ds525`
+    7. Setting up your profile : `1`
+    8. host : `localhost`
+    9. port [5432]:
+    10. user (dev username): `postgres`
+    11. pass (dev password): `postgres`
+    12. dbname (default database that dbt will build objects in): `postgres`
+    13. schema (default schema that dbt will build objects in): `dbt_1`
+    14. threads (1 or more) [1]: 
+    15. `code /home/codespace/.dbt/profiles.yml`
+    16. Can Copy data in profile for Create new file in folder ds525 name 'profiles.yml'
+    17. If you want to Create order should in : `cd ds525/`
+    18. How to Check can run order or not : `dbt debug`
+
+Explain folder in ds525
+
+- analysis : Collect Code about do analysis
+- log : Show logs that have already been run.
+- macros : function
+- model : Do data engineering and data module
+    - first_dbt_model
+    - second_dbt_model
+- seeds : Upload csv. into warehouse
+- snapshots : Work about snapshots
+- test : Collect test and Do Automate Test
+    
+    `dbt run` : it run code in folder model
+    
+    can test by Create new file in folder Model name 'my_simple_model.sql'
+    
+1. How to Use dbt in Project by level 
+    1. Create new layer folder in model folder 'staging'
+    2. define source : Create new file in 'staging' folder '_src.yml'
+    
+    ```jsx
+    version: 2
+    
+    sources:
+      - name: jaffle_shop
+        database: postgres
+        schema: public
+        tables:
+          - name: jaffle_shop_customers
+          - name: jaffle_shop_orders
+          - name: jaffle_shop_payments
+    ```
+    
+    c.  Create model by source in folder 'staging' :
+    
+    file : stg__jaffle_shop_customers.sql
+    
+    ```jsx
+    select * from {{ source('jaffle_shop', 'jaffle_shop_customers') }}
+    ```
+    
+    file: stg__jaffle_shop_orders.sql
+    
+    ```jsx
+    select * from {{ source('jaffle_shop', 'jaffle_shop_orders') }}
+    ```
+    
+    d. Create new layer folder 'marts' create file name 'jaffle_shop_obt.sql'
+    
+    ```jsx
+    select
+        o.id as order_id
+        , o.user_id
+        , c.first_name
+        , c.last_name
+        , o.order_date
+        , o.status as order_status
+    
+    from {{ ref('stg__jaffle_shop_orders') }} as o
+    join {{ ref('stg__jaffle_shop_customers') }} as c
+    on o.user_id = c.id
+    ```
+    
+    Dividing layers helps us make it easier to manage.
+    
+    can split table by add code in last 'dbt_project.yml'
